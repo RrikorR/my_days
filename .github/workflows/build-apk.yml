@@ -51,7 +51,8 @@ jobs:
           sed -i '/^android.minapi[[:space:]]*=/d; /^android.ndk_api[[:space:]]*=/d' "$PROJECT_DIR/buildozer.spec"
           printf '\nandroid.minapi = 24\nandroid.ndk_api = 24\n' >> "$PROJECT_DIR/buildozer.spec"
           cd "$PROJECT_DIR"
-
+          echo "charset-normalizer==3.3.2" > "$RUNNER_TEMP/pip-constraints.txt"
+          export PIP_CONSTRAINT="$RUNNER_TEMP/pip-constraints.txt"
           buildozer android debug
 
           APK=$(find bin -name "*.apk" -print -quit)
