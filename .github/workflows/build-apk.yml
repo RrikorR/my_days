@@ -1,0 +1,50 @@
+name: Build MY DAYS NEON APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            python3-pip python3-venv \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev \
+            libffi-dev libssl-dev cmake
+
+      - name: Install Buildozer
+        run: |
+          python3 -m pip install --user --break-system-packages buildozer cython==0.29.34
+
+      - name: Build APK
+        id: build
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          PROJECT_DIR=$(dirname "$(find . -name buildozer.spec -print -quit)")
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "buildozer.spec not found"
+            exit 1
+          fi
+          cd "$PROJECT_DIR"
+          buildozer android debug
+          APK=$(find bin -name "*.apk" -print -quit)
+          if [ -z "$APK" ]; then
+            echo "APK not found"
+            exit 1
+          fi
+          echo "path=$PROJECT_DIR/$APK" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MY-DAYS-NEON-APK
+          path: ${{ steps.build.outputs.path }}
