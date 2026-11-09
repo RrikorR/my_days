@@ -1,1 +1,29 @@
+name: Build MY DAYS NEON APK
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          mkdir app
+          unzip -q MY_DAYS_NEON_GitHub_ready.zip -d app
+
+      - name: Build Android APK
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          workdir: app
+          buildozer_version: stable
+
+      - name: Download APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MY-DAYS-NEON-APK
+          path: ${{ steps.buildozer.outputs.filename }}
