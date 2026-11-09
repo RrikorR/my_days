@@ -48,6 +48,8 @@ jobs:
           fi
 
           PROJECT_DIR=$(dirname "$SPEC")
+          sed -i '/^android.minapi[[:space:]]*=/d; /^android.ndk_api[[:space:]]*=/d' "$PROJECT_DIR/buildozer.spec"
+          printf '\nandroid.minapi = 24\nandroid.ndk_api = 24\n' >> "$PROJECT_DIR/buildozer.spec"
           cd "$PROJECT_DIR"
 
           buildozer android debug
