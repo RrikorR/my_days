@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Buildozer
         run: |
-          python3 -m pip install --user --break-system-packages buildozer cython==0.29.34
+          python3 -m pip install --user buildozer cython==0.29.34
 
       - name: Build APK
         id: build
