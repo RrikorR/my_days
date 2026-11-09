@@ -29,18 +29,36 @@ jobs:
         id: build
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          PROJECT_DIR=$(dirname "$(find . -name buildozer.spec -print -quit)")
-          if [ -z "$PROJECT_DIR" ]; then
+
+          ZIP=$(find . -maxdepth 1 -name "*.zip" -print -quit)
+
+          if [ -z "$ZIP" ]; then
+            echo "ZIP archive not found"
+            exit 1
+          fi
+
+          mkdir extracted
+          unzip -q "$ZIP" -d extracted
+
+          SPEC=$(find extracted -name buildozer.spec -print -quit)
+
+          if [ -z "$SPEC" ]; then
             echo "buildozer.spec not found"
             exit 1
           fi
+
+          PROJECT_DIR=$(dirname "$SPEC")
           cd "$PROJECT_DIR"
+
           buildozer android debug
+
           APK=$(find bin -name "*.apk" -print -quit)
+
           if [ -z "$APK" ]; then
             echo "APK not found"
             exit 1
           fi
+
           echo "path=$PROJECT_DIR/$APK" >> "$GITHUB_OUTPUT"
 
       - name: Upload APK
